@@ -1,0 +1,44 @@
+[0:00 — HOOK]
+Hello everyone. As businesses grow, auditing expense reports manually becomes a massive bottleneck that slows down payments and increases the risk of policy violations. Today, I'm excited to present ExpenseGuard, an intelligent, automated assistant designed to audit claims, check policy compliance, and screen for anomalies.
+
+[0:20 — WHAT IT IS]
+ExpenseGuard is a multi-agent system built on the Google Agent Development Kit, or ADK. It fits right into our Agents for Business track, focusing on corporate expense automation, financial policy validation, and risk mitigation.
+
+[0:40 — SHOW THE BANNER]
+(show assets/cover_page_banner.png)
+As you can see on the screen, ExpenseGuard is built around three core pillars: automated policy verification, advanced anomaly detection, and deep data security. It acts as an intelligent firewall for corporate spending.
+(pause)
+
+[1:00 — ARCHITECTURE]
+(show assets/architecture_diagram.png)
+Let's take a look at the workflow architecture. The entire system is governed by a deterministic ADK Graph Workflow.
+When an employee submits an expense, it first enters our Security Checkpoint node. This node handles immediate input verification, PII scrubbing, and prompt injection detection.
+If a security risk is found, the system routes the request to a Security Block node and terminates.
+Otherwise, the claim goes to our main Orchestrator Agent.
+The Orchestrator coordinates two specialized LlmAgents via AgentTools: the Policy Auditor and the Anomaly Detector.
+Both of these specialists use a local Model Context Protocol server, or MCP server. The Policy Auditor queries the MCP tools to look up category-specific spending guidelines and employee claim histories. Meanwhile, the Anomaly Detector queries the MCP budget tool to verify remaining department budgets.
+The specialists return their findings to the Orchestrator, which decides to Approve, Reject, or route the claim to a Review Router.
+If the Orchestrator flags a suspicious claim, the Review Router sends it to a Human Review node where the execution pauses and awaits a manager's manual input. Otherwise, it proceeds to the Final Output node.
+(pause)
+
+[2:00 — LIVE DEMO]
+(switch to playground at localhost:18081)
+Now, let's see this in action. I'll showcase three different scenarios in our local testing playground.
+First, I'm going to enter a high-value meal expense of twelve thousand dollars.
+(pause)
+As expected, the Security Checkpoint immediately flags this transaction because it exceeds our absolute single-expense limit of ten thousand dollars. The workflow is blocked before the LLM or specialists are ever invoked, protecting API cost and server resources.
+Next, let's enter a compliant transaction: a client lunch for forty-five dollars submitted by John Miller.
+(pause)
+This request passes the security checkpoint. The Orchestrator calls the Policy Auditor, which verifies that client lunches are allowed under the meals policy. The Anomaly Detector verifies engineering budget is sufficient. The Orchestrator returns a decision of APPROVED, and it routes straight to the final output.
+Finally, let's submit a yearly design software subscription for seven hundred and fifty dollars by Viola Smith.
+(pause)
+In this case, the Security Checkpoint passes, but when the Policy Auditor queries the MCP tool for Viola's history, it flags that she has repeat policy violations. The Orchestrator recommends NEEDS_REVIEW. The graph routes the request to the human review node, presenting us with this prompt: "Approve or Reject?". Let's type Approve.
+(pause)
+The workflow resumes and completes with a Manager Approved status.
+(pause)
+
+[3:00 — SECURITY & MCP]
+To summarize, our security checkpoint uses regular expressions to scrub credit cards and SSNs, checks for prompt injection attacks, and enforces hard limits, while logging everything to a structured JSON audit log. Our MCP server acts as our integration layer, giving the agents real-time access to live policy documents, budgets, and database histories via standard, decoupled tools.
+
+[3:30 — IMPACT / CLOSE]
+By deploying ExpenseGuard, companies can automate over eighty percent of standard expense reports, significantly reduce manual review times, and prevent financial leakage, all while maintaining absolute safety and manager control over edge cases. Thank you for your time!
